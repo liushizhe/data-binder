@@ -74,5 +74,30 @@ user.set("name", '12345');
 
 
 </script>
+<!-- 发布订阅demo -->
+<script type="text/javascript">
+  function Dep() {
+    this.subs = [];
+  }
+  Dep.prototype.addSub = function (sub) {
+    this.subs.push(sub);
+  }
+  Dep.prototype.notify = function () {
+    this.subs.forEach(function (sub) {
+      sub.update();
+    })
+  }
+  function Watcher(fn) {
+    this.fn = fn;
+  }
+  Watcher.prototype.update = function () {
+    this.fn();
+  }
+  var dep = new Dep();
+  dep.addSub(new Watcher(function () {
+    console.log('abcd');
+  }));
+  dep.notify();
+</script>
 </body>
 </html>
