@@ -81,6 +81,7 @@ user.set("name", '12345');
   }
   Dep.prototype.addSub = function (sub) {
     this.subs.push(sub);
+    return this;
   }
   Dep.prototype.notify = function () {
     this.subs.forEach(function (sub) {
@@ -96,6 +97,8 @@ user.set("name", '12345');
   var dep = new Dep();
   dep.addSub(new Watcher(function () {
     console.log('abcd');
+  })).addSub(new Watcher(function () {
+    console.log('1234');
   }));
   dep.notify();
 </script>
