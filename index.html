@@ -1,0 +1,78 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<style type="text/css">
+  *{
+    padding: 0;
+    margin: 0;
+  }
+  
+</style>
+
+</head>
+<body>
+
+<input type="text" data-bind-123="name" />
+<label data-bind-123="name"></label>
+
+<script type="text/javascript" src="jquery-1.12.0.js"></script>
+<script type="text/javascript">
+'use strict';
+
+function DataBinder(objectId) {
+  var publisher = $({}); //创建订阅器对象
+  var attr = "bind-" + objectId;
+  var msg = objectId + ":message";
+
+  // 绑定数据属性到dom元素上
+  $(document).on("change", "[data-" + attr + "]", function(evt) {
+    var $ele = $(this);
+    publisher.trigger(msg, [$ele.data(attr), $ele.val()])
+  })
+  // 广播订阅器上所有dom元素，更新dom元素对应值
+  publisher.on(msg, function(evt, attrName, value, context) {
+    $("[data-" + attr + "=" + attrName + "]").each(function() {
+      var $this = $(this);
+      if ($this.is("input,textarea,select")) {
+        $this.val(value);
+      } else {
+        $this.html(value);
+      }
+    })
+  })
+
+  return publisher;
+}
+
+function User(uid) {
+  var msg = uid + ":message";
+  var binder = new DataBinder(uid);
+  var user = {
+    attributes: {},
+    set: function(attr, val) {
+      this.attributes[attr] = val;
+      binder.trigger(msg, [attr, val, this]); // this用于更新订阅内容对象
+    },
+    get: function(attr) {
+      return this.attributes[attr];
+    },
+    binder: binder
+  }
+
+  binder.on(msg, function(evt, attr, val, ctx) {
+    if (ctx !== user) { //若由视图更改触发的事件，则更新对应数据属性
+      user.set(attr, val)
+    }
+  })
+
+  return user;
+}
+
+var user = new User(123);
+user.set("name", '12345');
+
+
+</script>
+</body>
+</html>
