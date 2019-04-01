@@ -102,5 +102,39 @@ user.set("name", '12345');
   }));
   dep.notify();
 </script>
+<script>
+function Publisher () {
+  this.subscribers = [];
+}
+Publisher.prototype.deliver = function (data) {
+  this.subscribers.forEach(function (fn) {
+    fn.fire(data)
+  })
+}
+function Observe (cb) {
+  this.fire = cb;
+}
+Observe.prototype.subscribe = function (publisher) {
+  var that = this;
+  var exist = publisher.subscribers.filter(function (item) {
+    return item.fire === that.fire;
+  });
+  if (exist.length === 0) {
+    publisher.subscribers.push(this)
+  }
+}
+Observe.prototype.unsubscribe = function (publisher) {
+  publisher.subscribers = publisher.subscribers.filter(function (item) {
+    return item.fire !== this.fire;
+  })
+}
+var pub = new Publisher();
+var ob1 = new Observe(function(data) {
+  console.log('ob1', data);
+});
+ob1.subscribe(pub);
+pub.deliver('123');
+ob1.unsubscribe(pub);
+</script>
 </body>
 </html>
